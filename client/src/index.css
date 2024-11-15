@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Global scrollbar styling */
+::-webkit-scrollbar {
+  width: 10px; /* width of the scrollbar */
+  height: 10px; /* height for horizontal scrollbar */
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: rgba(79, 70, 229, 0.7); /* Blue color for thumb in light theme */
+  border: 3px solid transparent; /* Optional: adds a little space around the thumb */
+  background-clip: content-box; /* Optional: to avoid overlap with borders */
+}
+
+::-webkit-scrollbar-track {
+  background-color: #f1f1f1; /* Light grey track in light theme */
+  border-radius: 10px;
+}
+
+/* Dark theme scrollbar styles */
+body.dark-mode ::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.7); /* Light color thumb for dark theme */
+}
+
+body.dark-mode ::-webkit-scrollbar-track {
+  background-color: #333; /* Dark background for the track in dark theme */
+}
+
+/* Customize the scrollbar for the input area */
+input[type="text"], textarea {
+  scrollbar-color: rgba(79, 70, 229, 0.7) #f1f1f1; /* thumb color and track color for Firefox */
+}
+
+body.dark-mode input[type="text"], body.dark-mode textarea {
+  scrollbar-color: rgba(255, 255, 255, 0.7) #333; /* thumb and track for dark theme */
+}
