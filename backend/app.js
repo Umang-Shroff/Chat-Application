@@ -87,6 +87,21 @@ app.post('/api/conversation', async (req,res,next) => {
     }
 })
 
+app.get('/api/conversation/:userId', async (req,res) => {
+    try {
+        const userId = req.params.userId;
+        const conversations = await Conversations.find({ members: { $in: [userId] } })
+        const conversationUserData = Promise.all(conversations.map(async(conversation)=>{
+            const receiverId =conversation.members.find((member)=> member !== userId);
+            const user = await Users.findById(receiverId);
+            return { user: { email: user.email, name: user.name }, conversationId: conversation._id }
+        }))
+        res.status(200).json(conversationUserData);
+    } catch (error) {
+        console.log("Error: ",error)
+    }
+})
+
 app.listen(PORT, (req,res)=>{
     console.log(`Listening on port ${PORT}`)
 })
