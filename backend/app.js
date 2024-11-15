@@ -7,6 +7,7 @@ require('./db/connection')
 
 // IMPORT FILES
 const Users = require('./models/Users')
+const Conversations = require('./models/Conversation')
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -72,6 +73,17 @@ app.post('/api/login', async (req,res,next)=>{
         }
     } catch (error) {
         return res.status(400).json({ "error": error})
+    }
+})
+
+app.post('/api/conversation', async (req,res,next) => {
+    try {
+        const {senderId, receiverId} = req.body;
+        const newConversation = new Conversations({ members: [senderId, receiverId] })
+        await newConversation.save();
+        res.status(200).send("Conversation created successfully")
+    } catch (error) {
+        return res.status(400).json({ "Error": error })
     }
 })
 
