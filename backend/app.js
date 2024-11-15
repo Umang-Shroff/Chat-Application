@@ -102,6 +102,17 @@ app.get('/api/conversation/:userId', async (req,res) => {
     }
 })
 
+app.post('/api/message',async (req,res) => {
+    try {
+        const { conversationId, senderId, message } = req.body;
+        const newMessage = new Messages({ conversationId, senderId, message });
+        await newMessage.save();
+        res.status(200).send("Message sent successfully");
+    } catch (error) {
+        console.log("Error: ",error)
+    }
+})
+
 app.listen(PORT, (req,res)=>{
     console.log(`Listening on port ${PORT}`)
 })
