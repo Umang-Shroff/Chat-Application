@@ -128,6 +128,15 @@ app.get('/api/message/:conversationId', async(req,res)=>{
     }
 })
 
+app.get('/api/users', async (req,res) => {
+    try {
+        const users = await Users.find();
+        res.status(200).json(users);
+    } catch (error) {
+        console.log("Error: ",error)
+    }
+})
+
 app.listen(PORT, (req,res)=>{
     console.log(`Listening on port ${PORT}`)
 })
