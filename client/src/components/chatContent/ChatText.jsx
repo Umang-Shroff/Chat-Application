@@ -2,26 +2,19 @@ import React, { useEffect } from 'react'
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import axios from 'axios';
 
-const ChatText = ({ convoId, showMessage }) => {
-
-  // useEffect(()=>{
-  //   const getMessages = async() => {
-  //     console.log("RESPONSE IN CHAT-TEXT BEFORE REQUEST :::::")
-  //     const res = await axios.get(`/api/message/${chatSelected}`)
-  //     console.log("RESPONSE IN CHAT-TEXT:::::  ",res)
-  //   }
-  //   getMessages()
-  // },[])
+const ChatText = ({ convoName, showMessage }) => {
 
   return (
     <>
       <div className="fixed top-0 w-full h-[15%] bg-white border-b-[1.5px] shadow-md flex justify-between items-center px-6 z-10">
   <div className="flex items-center gap-4">
-    <img src="#" className="h-12 w-12 bg-gray-300 border rounded-full" />
+  { convoName === '' ? <span></span> : <><img src="#" className="h-12 w-12 bg-gray-300 border rounded-full" />
     <div>
-      <h1 className="text-lg font-semibold text-black">{convoId}</h1>
+      <h1 className="text-lg font-semibold text-black">{convoName}</h1>
       <span className="text-sm text-gray-500">Online</span>
     </div>
+    </>
+    }
   </div>
 </div>
 
@@ -33,18 +26,25 @@ const ChatText = ({ convoId, showMessage }) => {
 
         <div className="overflow-y-auto h-[70vh] px-6 relative z-10">
           {
-            showMessage.map((message, index)=>{
-              return(
-                <>
-                  <div>
-
+            showMessage.map((message, user)=>{
+              console.log("INSIDE MAP FCTN::: ",message)
+              if(message.user.name===convoName){
+                return(
+                    <div className="max-w-[60%] mt-4 bg-white p-4 rounded-xl shadow-md rounded-tl-none">
+                      {/* {message} */}{message.message}
+                    </div>
+                )
+              }else{
+                return(
+                  <div className="max-w-[60%] mt-4 ml-auto bg-blue-500 text-white p-4 rounded-xl rounded-tr-none shadow-md">
+                    {/* {message} */}{message.message}
                   </div>
-                </>
               )
+              }
             })
           
           }
-          <div className="max-w-[60%] mt-4 bg-white p-4 rounded-xl shadow-md rounded-tl-none">
+          {/* <div className="max-w-[60%] mt-4 bg-white p-4 rounded-xl shadow-md rounded-tl-none">
             Lorem ipsum is simply dummy text of the printing and typesetting industry.
           </div>
           <div className="max-w-[60%] mt-4 ml-auto bg-blue-500 text-white p-4 rounded-xl rounded-tr-none shadow-md">
@@ -61,7 +61,7 @@ const ChatText = ({ convoId, showMessage }) => {
           </div>
           <div className="max-w-[60%] mt-4 ml-auto bg-blue-500 text-white p-4 rounded-xl rounded-tr-none shadow-md">
             Lorem ipsum is simply dummy text of the printing and typesetting industry.
-          </div>
+          </div> */}
         </div>
       </div>
 

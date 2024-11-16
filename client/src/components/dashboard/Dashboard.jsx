@@ -17,12 +17,15 @@ const Dashboard = () => {
   },[])
 
   const handleSelectChat = async (chatId, name) => {
-    setSelectedChat(chatId);
-    setSelectedName(name);
+    setSelectedChat();
+    setSelectedName('');
     setMessages([]);
 
+    setSelectedChat(chatId);
+    setSelectedName(name);
+
     const resx = await axios.get(`/api/message/${selectedChat}`)
-    console.log("RESPONSE IN CHAT-TEXT:::::  ",resx)
+    console.log("RESPONSE IN CHAT-TEXT:::::  ",resx.data)
     setMessages(resx.data)
   };
 
@@ -69,7 +72,7 @@ const Dashboard = () => {
       </div>
           
       <div className="w-[65%] border overflow-y-hidden overflow-x-hidden h-screen">
-        <ChatText convoId={selectedName} showMessage={messages}/>
+        <ChatText convoName={selectedName} showMessage={messages}/>
       </div>
     </div>
 
