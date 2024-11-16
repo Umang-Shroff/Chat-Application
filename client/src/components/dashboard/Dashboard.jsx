@@ -8,16 +8,33 @@ const Dashboard = () => {
   useEffect(()=>{
     const fetchData = JSON.parse(localStorage.getItem('user:detail'))
     const fetchTalks = async() => {
-      const res = await axios.get(`/api/conversations/${fetchData?.id}`,)
+      const res = await axios.get(`/api/conversations/${fetchData?.id}`)
       const resData = res;
-      console.log('resData :: ', resData)
-      setTalks(resData)
+      console.log('resData :: ', resData.data)
+      setTalks(resData.data)
     }
     fetchTalks()
   },[])
 
+  const handleSelectChat = async (chatId, name) => {
+    setSelectedChat(chatId);
+    setSelectedName(name);
+    setMessages([]);
+
+    const resx = await axios.get(`/api/message/${selectedChat}`)
+    console.log("RESPONSE IN CHAT-TEXT:::::  ",resx)
+    setMessages(resx.data)
+  };
+
+  const [selectedChat, setSelectedChat] = useState(null);
+  const [selectedName, setSelectedName] = useState('');
   const [userData, setUserData] = useState(JSON.parse(localStorage.getItem('user:detail')));
   const [talks, setTalks] = useState([])
+  const [messages, setMessages] = useState([]);
+
+  console.log("Conversations: ",talks)
+  console.log("Selected chat id: ", selectedChat)
+
   return (
     <div className="w-screen flex">
       <div className="w-[8%] flex justify-center border h-screen bg-white">
@@ -46,11 +63,13 @@ const Dashboard = () => {
       </div>
           
       <div className="w-[27%] border overflow-y-scroll overflow-x-hidden h-screen">
-        <ChatList/>
+        <ChatList 
+          convoData={talks} onSelectChat={handleSelectChat}
+         />
       </div>
           
       <div className="w-[65%] border overflow-y-hidden overflow-x-hidden h-screen">
-        <ChatText/>
+        <ChatText convoId={selectedName} showMessage={messages}/>
       </div>
     </div>
 

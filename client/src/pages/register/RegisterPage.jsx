@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 
 const RegisterPage = () => {
 
+    const navigate = useNavigate();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -15,6 +17,7 @@ const RegisterPage = () => {
             await axios.post('/api/register',{ name, email, password })
             console.log("Data registered: ",{name, email, password})
             alert("Success registered")
+            navigate('/login')
         } catch (error) {
             console.log('Error on RegisterPage client: ',error)
             alert("Error: ",error)

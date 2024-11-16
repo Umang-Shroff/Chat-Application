@@ -132,7 +132,7 @@ app.get('/api/message/:conversationId', async(req,res)=>{
         const messages = await Messages.find({ conversationId });
         const messageUserData = Promise.all(messages.map(async (message) => {
             const user = await Users.findById(message.senderId);
-            return { user: { email: user.email, name: user.name }, message: message.message }
+            return { user: { id: user._id, email: user.email, name: user.name }, message: message.message }
         }))
         res.status(200).json(await messageUserData)
     } catch (error) {
