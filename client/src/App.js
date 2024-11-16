@@ -4,6 +4,10 @@ import SideBar from './components/sidebar/SideBar';
 import ChatList from './components/chatList/ChatList';
 import Dashboard from './components/dashboard/Dashboard';
 import LoginPage from './pages/login/LoginPage';
+import RegisterPage from './pages/register/RegisterPage';
+import axios from 'axios';
+
+axios.defaults.baseURL = 'http://localhost:8000';
 
 const ProtectedRoute = ({ children, auth = false }) => {
   const isLoggedIn = localStorage.getItem('user:token') !== null || true;

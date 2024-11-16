@@ -1,6 +1,7 @@
 const express = require('express');
 const bcryptjs = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const cors = require('cors')
 
 // DB CONNECTION
 require('./db/connection')
@@ -15,7 +16,15 @@ const PORT = process.env.PORT || 8000;
 
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
-// app.use(cors())
+
+const corsOptions = {
+    origin: 'http://localhost:3000', 
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'], 
+};
+
+app.use(cors(corsOptions));
 
 // ROUTES
 
