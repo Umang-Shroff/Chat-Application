@@ -17,15 +17,6 @@ const ChatList = ({ convoData, onSelectChat }) => {
         setSearchQuery('');
     } 
 
-    // const fetchMessages = async(conversationId) => {
-    //   try {
-    //     const res = await axios.get(`/api/message/${conversationId}`)
-    //     console.log()
-    //   } catch (error) {
-    //     console.log("Error in msg display using convoId: ",error)
-    //   }
-    // }
-
   return (
     <div className="w-80 mx-auto font-sans text-gray-800">
       <header className="flex justify-between items-center p-6 border-b-[1.5px] bg-white shadow-md">
@@ -58,7 +49,7 @@ const ChatList = ({ convoData, onSelectChat }) => {
 
       <div className="p-4">
         <div>
-          <h3 className="text-sm text-blue-400 mt-4 mb-2">All Chats</h3>
+          <h3 className="text-sm text-blue-500 mt-4 mb-2">All Chats</h3>
           {
           convoData.length > 0 ?
           convoData

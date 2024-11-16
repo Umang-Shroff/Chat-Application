@@ -10,7 +10,7 @@ const Dashboard = () => {
     const fetchTalks = async() => {
       const res = await axios.get(`/api/conversations/${fetchData?.id}`)
       const resData = res;
-      console.log('resData :: ', resData.data)
+      // console.log('resData :: ', resData.data)
       setTalks(resData.data)
     }
     fetchTalks()
@@ -21,12 +21,15 @@ const Dashboard = () => {
     setSelectedName('');
     setMessages([]);
 
-    setSelectedChat(chatId);
+    setSelectedChat(chatId);  
     setSelectedName(name);
 
     const resx = await axios.get(`/api/message/${selectedChat}`)
-    console.log("RESPONSE IN CHAT-TEXT:::::  ",resx.data)
-    setMessages(resx.data)
+    // console.log("RESPONSE IN CHAT-TEXT:::::  ",resx.data)
+    // setMessages(resx.data)
+    setMessages({messages: resx, receiver: name, selectedChat})
+    console.log("MESSAGE IS BELOW:")
+    console.log(messages)
   };
 
   const [selectedChat, setSelectedChat] = useState(null);
@@ -35,8 +38,8 @@ const Dashboard = () => {
   const [talks, setTalks] = useState([])
   const [messages, setMessages] = useState([]);
 
-  console.log("Conversations: ",talks)
-  console.log("Selected chat id: ", selectedChat)
+  // console.log("Conversations: ",talks)
+  // console.log("Selected chat id: ", selectedChat)
 
   return (
     <div className="w-screen flex">
@@ -72,7 +75,7 @@ const Dashboard = () => {
       </div>
           
       <div className="w-[65%] border overflow-y-hidden overflow-x-hidden h-screen">
-        <ChatText convoName={selectedName} showMessage={messages}/>
+        <ChatText convoName={selectedName} senderName={userData.name} convoId={selectedChat} showMessage={messages}/>
       </div>
     </div>
 
