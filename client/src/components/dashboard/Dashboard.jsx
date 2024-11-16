@@ -18,6 +18,7 @@ const Dashboard = () => {
           <button
             onClick={() => {
               localStorage.removeItem('user:token');
+              localStorage.removeItem('user:detail');
               alert("You have been logged out.");
               window.location.href = '/login'; 
             }}

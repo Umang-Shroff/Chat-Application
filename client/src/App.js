@@ -10,7 +10,7 @@ import axios from 'axios';
 axios.defaults.baseURL = 'http://localhost:8000';
 
 const ProtectedRoute = ({ children, auth = false }) => {
-  const isLoggedIn = localStorage.getItem('user:token') !== null || true;
+  const isLoggedIn = localStorage.getItem('user:token') !== null || false;
 
   if(!isLoggedIn && auth){
     return <Navigate to={'/register'} />

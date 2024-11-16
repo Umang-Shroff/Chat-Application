@@ -72,9 +72,10 @@ app.post('/api/login', async (req,res,next)=>{
                         email: user.email
                     }
                     const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY || "JWT_SECRET_KEY_IS_HERE"
-                    jwt.sign(payload, JWT_SECRET_KEY, { expiredIn: 84600 }, async (err, token) => {
+                    jwt.sign(payload, JWT_SECRET_KEY, { expiresIn: 84600 }, async (err, token) => {
                         await Users.updateOne({ _id: user._id }, { $set : {token} })
                         user.save();
+                        // console.log("token setting error",err)
                         next()
                     })
                     res.status(200).json({ user:{ id: user._id, email: user.email, name:user.name}, token: user.token })

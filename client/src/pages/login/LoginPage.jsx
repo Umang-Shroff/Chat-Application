@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import axios from 'axios';
 import {  useNavigate } from 'react-router-dom';
 
@@ -13,10 +13,14 @@ const LoginPage = () => {
     const loginHandle = async (e) => {
         e.preventDefault()
         try {
-            await axios.post('/api/login',{email, password})
-            alert("Logged")
-            localStorage.setItem('user:token',JSON.stringify("tokenset"))
-            navigate('/')
+            const resp = await axios.post('/api/login',{email, password})
+            // alert("Logged")
+            console.log(resp)
+            if(resp.data.token){
+                localStorage.setItem('user:token',JSON.stringify(resp.data.token))
+                localStorage.setItem('user:detail',JSON.stringify(resp.data.user))
+                navigate('/')
+            }
         } catch (error) {
             console.log('Error on LoginPage client: ',error)
         }
