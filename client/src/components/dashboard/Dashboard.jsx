@@ -1,16 +1,31 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import ChatList from '../chatList/ChatList'
 import ChatText from '../chatContent/ChatText'
+import axios from 'axios';
 
 const Dashboard = () => {
 
+  useEffect(()=>{
+    const fetchData = JSON.parse(localStorage.getItem('user:detail'))
+    const fetchTalks = async() => {
+      const res = await axios.get(`/api/conversations/${fetchData?.id}`,)
+      const resData = res;
+      console.log('resData :: ', resData)
+      setTalks(resData)
+    }
+    fetchTalks()
+  },[])
+
+  const [userData, setUserData] = useState(JSON.parse(localStorage.getItem('user:detail')));
+  const [talks, setTalks] = useState([])
   return (
     <div className="w-screen flex">
       <div className="w-[8%] flex justify-center border h-screen bg-white">
         <div className="absolute bottom-10 flex flex-col justify-center items-center space-y-4">
 
+          <p className="font-semibold">{userData?.name}</p>
           {/* Profile Image */}
-          <div className="border border-blue-700 p-[2px] rounded-full">
+          <div className="border border-blue-700 p-[2px] relative bottom-3 rounded-full">
             <img className="bg-blue-300 border w-14 rounded-full" src="" width={75} height={75}/>    
           </div>
 

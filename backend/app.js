@@ -105,6 +105,7 @@ app.get('/api/conversations/:userId', async (req,res) => {
         const conversationUserData = Promise.all(conversations.map(async(conversation)=>{
             const receiverId =conversation.members.find((member)=> member !== userId);
             const user = await Users.findById(receiverId);
+            console.log("Email: ",user.email," name: ",user.name, "ConversationID: ",conversation._id)
             return { user:{ email: user.email, name:user.name},conversationId: conversation._id }
         }))
         res.status(200).json(await conversationUserData);
