@@ -17,6 +17,8 @@ const ChatList = ({ convoData, onSelectChat }) => {
         setSearchQuery('');
     } 
 
+    // console.log("ConvoData:: ",convoData)
+
   return (
     <div className="w-80 mx-auto font-sans text-gray-800">
       <header className="flex justify-between items-center p-6 border-b-[1.5px] bg-white shadow-md">
@@ -56,12 +58,18 @@ const ChatList = ({ convoData, onSelectChat }) => {
             .filter((chat) =>
               searchQuery === '' ? chat : chat.user.name.toLowerCase().includes(searchQuery.toLocaleLowerCase())
             )
-            .map(({conversationId, user, index}) => {
-              // <ChatItem key={index} {...chat} />
-              return(
-                <div key={index} className="border-b-[1.5px] cursor-pointer">
+            .map(({ conversationId, user, index }) => {
+              // Use conversationId as the key, if available; otherwise fallback to index
+              const key = conversationId || index;
+            
+              return (
+                <div key={key} className="border-b-[1.5px] cursor-pointer">
                   <div
-                    className='mt-2 flex items-center rounded-lg p-3  mb-2 hover:bg-gray-100' onClick={()=>onSelectChat(conversationId, user?.name)}
+                    className="mt-2 flex items-center rounded-lg p-3 mb-2 hover:bg-gray-100"
+                    onClick={() => {
+                      console.log("userName selected: ", user);
+                      onSelectChat(conversationId, user?.name, user?.id);
+                    }}
                   >
                     <div className="w-10 h-10 bg-gray-300 rounded-full mr-3"></div>
                     <div className="flex-1">
@@ -73,8 +81,9 @@ const ChatList = ({ convoData, onSelectChat }) => {
                     </div>
                   </div>
                 </div>
-              )
-          }) : <div className='text-center text-lg mt-16 font-semibold'>No Conversations</div>        } 
+              );
+            })
+             : <div className='text-center text-lg mt-16 font-semibold'>No Conversations</div>        } 
         </div>
       </div>
     </div>
