@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken')
 const cors = require('cors')
 const io = require('socket.io')(8080,{
     cors: {
-        origin: 'https://673a13cd1f54d31139981200--chat-application55.netlify.app',
+        origin: 'https://chat-application-seven-eosin.vercel.app',
     }
 })
 
@@ -23,7 +23,7 @@ app.use(express.json())
 app.use(express.urlencoded({extended: false}))
 
 const corsOptions = {
-    origin: 'https://673a13cd1f54d31139981200--chat-application55.netlify.app', 
+    origin: 'https://chat-application-seven-eosin.vercel.app', 
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization'], 
