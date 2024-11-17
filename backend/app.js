@@ -114,29 +114,90 @@ app.get('/api/conversations/:userId', async (req,res) => {
     }
 })
 
-app.post('/api/message',async (req,res) => {
+
+app.post('/api/message', async (req, res) => {
     try {
         const { conversationId, senderId, message, receiverId } = req.body;
-        console.log({conversationId, senderId, message, receiverId})
-        if(!senderId || !message){ console.log("!sender || !msg"); return res.status(400).send("Please fill all fields")}
-        if(conversationId==='new' && receiverId){
-            console.log("!conversationId && receiverId");
-            const newConversation = new Conversations({ members:[senderId, receiverId] });
-            await newConversation.save();
-            const newMessage = new Messages({ conversationId: newConversation._id, senderId, message});
-            await newMessage.save();
-            return res.status(200).send("Message sent successfully")
-        }
-        else if(!conversationId && !receiverId){
+        console.log({ conversationId, senderId, message, receiverId });
+
+        // Check for missing fields
+        if (!senderId || !message) {
+            console.log("!sender || !msg");
             return res.status(400).send("Please fill all fields");
         }
-        const newMessage = new Messages({ conversationId, senderId, message });
+
+        // If it's a new conversation and receiverId is provided
+        if (conversationId === 'new' && receiverId) {
+            console.log("!conversationId && receiverId");
+
+            // Check if the conversation between senderId and receiverId already exists
+            const existingConversation = await Conversations.findOne({
+                members: { $all: [senderId, receiverId] }
+            });
+
+            if (existingConversation) {
+                console.log("senderId and receiverId in database repeated");
+                // const newMessage = new Messages({ conversationId, senderId, message });
+                // await newMessage.save();
+                // res.status(200).send("Message sent successfully");
+                // return res.status(400).send("Conversation already exists between these users");
+            }else{
+                // If no existing conversation
+                const newConversation = new Conversations({
+                    members: [senderId, receiverId]
+                });
+                await newConversation.save();
+    
+                const newMessage = new Messages({
+                    conversationId: newConversation._id,
+                    senderId,
+                    message
+                });
+                await newMessage.save();
+            }
+            return res.status(200).send("Message sent successfully");
+        } else if (!conversationId && !receiverId) {
+            return res.status(400).send("Please fill all fields");
+        }
+        const newMessage = new Messages({
+            conversationId,
+            senderId,
+            message
+        });
         await newMessage.save();
         res.status(200).send("Message sent successfully");
+
     } catch (error) {
-        console.log("Error: ",error)
+        console.log("Error: ", error);
+        res.status(500).send("Internal Server Error");
     }
-})
+});
+
+
+// app.post('/api/message',async (req,res) => {
+//     try {
+//         const { conversationId, senderId, message, receiverId } = req.body;
+//         console.log({conversationId, senderId, message, receiverId})
+//         if(!senderId || !message){ console.log("!sender || !msg"); return res.status(400).send("Please fill all fields")}
+//         if(conversationId==='new' && receiverId){
+//             console.log("!conversationId && receiverId");
+
+//             const newConversation = new Conversations({ members:[senderId, receiverId] });
+//             await newConversation.save();
+//             const newMessage = new Messages({ conversationId: newConversation._id, senderId, message});
+//             await newMessage.save();
+//             return res.status(200).send("Message sent successfully")
+//         }
+//         else if(!conversationId && !receiverId){
+//             return res.status(400).send("Please fill all fields");
+//         }
+//         const newMessage = new Messages({ conversationId, senderId, message });
+//         await newMessage.save();
+//         res.status(200).send("Message sent successfully");
+//     } catch (error) {
+//         console.log("Error: ",error)
+//     }
+// })
 
 app.get('/api/message/:conversationId', async(req,res)=>{
     try {
