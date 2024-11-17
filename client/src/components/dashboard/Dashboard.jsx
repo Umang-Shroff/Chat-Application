@@ -53,8 +53,9 @@ const Dashboard = () => {
   const messageRef = useRef(null)
 
   const [socket, setSocket] = useState(null);
-  const [users, setUsers] = useState([]);
-  const [activeUsers, setActiveUsers] = useState([]);
+  // const [users, setUsers] = useState([]);
+  // const [activeUsers, setActiveUsers] = useState([]);
+  const [setActiveUsers] = useState([]);
 
   const [selectedChat, setSelectedChat] = useState(null);
   const [selectedName, setSelectedName] = useState('');
@@ -65,9 +66,6 @@ const Dashboard = () => {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [typedText, setTypedText] = useState('');
   const [allUsers, setAllUsers] = useState([]);
-
-
-  const [status, setStatus] = useState('Offline'); // Default to 'Offline'
 
   useEffect(() => {
     if (!socket || !userData?.id) return;
@@ -234,7 +232,11 @@ const Dashboard = () => {
       <div className="w-full sm:w-[8%] flex justify-center border h-screen bg-white relative">
         <div className="flex items-center flex-col pt-6 w-24 sm:w-24 lg:w-24 h-screen border-gray-300 border-r-2">
           <div className="flex justify-center border rounded-lg bg-blue-400 h-16 w-16 mb-4">
-            <img src={`${process.env.PUBLIC_URL}/assets/imgs/icons8-telegram-app-100.png`} />
+          <img
+  src={`${process.env.PUBLIC_URL}/assets/imgs/icons8-telegram-app-100.png`}
+  alt="Telegram app icon"
+/>
+
           </div>
 
           <div id="allchat" className="h-12 w-12 bg-blue-200 border flex hover:bg-blue-300 justify-center items-center mt-6 rounded-lg cursor-pointer">
