@@ -8,7 +8,7 @@ const io = require('socket.io')(8080,{
     }
 })
 
-const port = 'https://chat-application-3jzb.onrender.com';
+// const port = 'https://chat-application-3jzb.onrender.com';
 
 // DB CONNECTION
 require('./db/connection')
@@ -19,7 +19,7 @@ const Conversations = require('./models/Conversation');
 const Messages = require('./models/Messages');
 
 const app = express();
-const PORT = port || 8000;
+const PORT = process.env.PORT || 8000;
 
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
