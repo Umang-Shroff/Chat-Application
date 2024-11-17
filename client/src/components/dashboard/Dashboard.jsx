@@ -4,8 +4,49 @@ import ChatList from '../chatList/ChatList'
 import axios from 'axios';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import { io } from 'socket.io-client';
+import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
+import PeopleOutlineOutlinedIcon from '@mui/icons-material/PeopleOutlineOutlined';
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
+
+import IntroJs from 'intro.js';
+import 'intro.js/introjs.css';
 
 const Dashboard = () => {
+
+
+  useEffect(() => {
+    const intro = IntroJs();
+
+    intro.setOptions({
+      steps: [
+        {
+          element: '#allchat',
+          intro: 'Access all the chats involving you.',
+        },
+        {
+          element: '#allAvailableContacts',
+          intro: 'Find out all the available contacts to initiate a conversation.',
+        },
+        {
+          element: '#currentChats',
+          intro: 'Displays all the people you have talked with.',
+        },
+        {
+          element: '#as',
+          intro: 'Make sure to REFRESH the page EVERY TIME you send a conversation.',
+        },
+        {
+          element: '#asd',
+          intro:'Happy Chatting!!!'
+        }
+      ],
+      showStepNumbers: true,
+      exitOnOverlayClick: false,
+    });
+
+    intro.start(); 
+  }, []);
+
 
   const messageRef = useRef(null)
 
@@ -22,6 +63,33 @@ const Dashboard = () => {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [typedText, setTypedText] = useState('');
   const [allUsers, setAllUsers] = useState([]);
+
+
+  const [status, setStatus] = useState('Offline'); // Default to 'Offline'
+
+  useEffect(() => {
+    if (!socket || !userData?.id) return;
+
+    // Listen for status updates from the server
+    socket.on('updateUserStatus', (status) => {
+        // Check if status is an object, if so, update the status of all users
+        setAllUsers((prevUsers) => 
+            prevUsers.map((user) => ({
+                ...user,
+                status: status[user.id] || 'offline', // Default to 'offline' if no status found
+            }))
+        );
+    });
+
+    return () => {
+        socket.off('updateUserStatus'); // Clean up socket listeners on unmount
+    };
+}, [socket, userData?.id]);
+
+
+
+
+
 
   // Fetch conversations on mount
   useEffect(() => {
@@ -161,14 +229,20 @@ const Dashboard = () => {
       {/* Sidebar */}
       <div className="w-full sm:w-[8%] flex justify-center border h-screen bg-white relative">
         <div className="flex items-center flex-col pt-6 w-24 sm:w-24 lg:w-24 h-screen border-gray-300 border-r-2">
-          <div className="flex justify-center border rounded-lg bg-blue-700 h-16 w-16 mb-4"></div>
+          <div className="flex justify-center border rounded-lg bg-blue-400 h-16 w-16 mb-4">
+            <img src={`${process.env.PUBLIC_URL}/assets/imgs/icons8-telegram-app-100.png`} alt="My Image" />
+          </div>
 
-          <div className="h-12 w-12 bg-blue-400 border mt-6 rounded-lg cursor-pointer"></div>
-
-          <div
-            className="h-12 w-12 bg-blue-400 border mt-6 rounded-lg cursor-pointer"
+          <div id="allchat" className="h-12 w-12 bg-blue-200 border flex hover:bg-blue-300 justify-center items-center mt-6 rounded-lg cursor-pointer">
+            <ChatOutlinedIcon className="text-black" />
+          </div>
+            
+          <div id="allAvailableContacts"
+            className="h-12 w-12 bg-blue-200 border flex hover:bg-blue-300 justify-center items-center mt-6 rounded-lg cursor-pointer"
             onClick={openPanel}
-          ></div>
+          >
+            <PeopleOutlineOutlinedIcon className="text-black" />
+          </div>
 
           {/* Panel for all users (Contacts) */}
           <div
@@ -182,29 +256,29 @@ const Dashboard = () => {
               </button>
             </div>
           
-            <div className="p-6 h-full overflow-y-scroll">
-              <h2 className="text-lg font-semibold">All Contacts</h2>
-          
-              {allUsers.map(({ userId, user, index }) => {
-                const key = index || userId;
-                return (
-                  <div key={key} className="border-b-[1.5px] cursor-pointer">
-                    <div
-                      className="mt-2 flex items-center rounded-lg p-3 mb-2 hover:bg-gray-100"
-                      onClick={() => handleSelectChat('new', user?.name, user?.receiverId)}
-                    >
-                      <div className="w-10 h-10 bg-gray-300 rounded-full mr-3"></div>
-                      <div className="flex-1">
+            <div className="p-6 h-[80%] overflow-y-scroll">
+    <h2 className="text-lg font-semibold">All Contacts</h2>
+    {allUsers.map(({ userId, user, index }) => {
+        const key = index || userId;
+        return (
+            <div key={key} className="border-b-[1.5px] cursor-pointer">
+                <div
+                    className="mt-2 flex items-center rounded-lg p-3 mb-2 hover:bg-gray-100"
+                    onClick={() => handleSelectChat('new', user?.name, user?.receiverId)}
+                >
+                    <div className="w-10 h-10 bg-gray-300 rounded-full flex justify-center items-center mr-3"><PersonOutlineOutlinedIcon/></div>
+                    <div className="flex-1">
                         <div className="flex justify-between items-center">
-                          <span className="font-semibold">{user?.name}</span>
-                          <span className="text-xs text-gray-500">{user?.email}</span>
+                            <span className="font-semibold">{user?.name}</span>
+                            <span className="text-xs text-gray-500">{user?.email}</span>
                         </div>
-                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                </div>
             </div>
+        );
+    })}
+</div>
+
           </div>
             
           {/* Bottom Section (Profile and Logout) */}
@@ -213,7 +287,7 @@ const Dashboard = () => {
             
             {/* Profile Image */}
             <div className="border border-blue-700 p-[2px] relative bottom-3 rounded-full">
-              <img className="bg-blue-300 border w-14 h-14 sm:w-16 sm:h-16 rounded-full" src="" width={75} height={75} />
+              <div className="bg-blue-200 border flex justify-center items-center w-14 h-14 sm:w-16 sm:h-16 rounded-full"><PersonOutlineOutlinedIcon className="scale-125"/></div>
             </div>
             
             {/* Logout Button */}
@@ -234,7 +308,7 @@ const Dashboard = () => {
       </div>
 
       {/* Main content */}
-      <div className="w-[27%] border overflow-y-scroll overflow-x-hidden h-screen">
+      <div id="currentChats" className="w-[27%] border overflow-y-scroll overflow-x-hidden h-screen">
         <ChatList convoData={talks} onSelectChat={handleSelectChat} />
       </div>
 
@@ -246,7 +320,7 @@ const Dashboard = () => {
               <span></span>
             ) : (
               <>
-                <img src="#" className="h-12 w-12 bg-gray-300 border rounded-full" />
+                <div className="h-12 w-12 bg-gray-300 border flex justify-center items-center rounded-full"><PersonOutlineOutlinedIcon/></div>
                 <div>
                   <h1 className="text-lg font-semibold text-black">{selectedName}</h1>
                   <span className="text-sm text-gray-500">{userData.email}</span>
@@ -264,32 +338,37 @@ const Dashboard = () => {
           
           {/* Message list */}
           <div className="overflow-y-auto h-[70vh] sm:h-[70vh] px-6 relative z-10">
-            {messages?.messages?.data?.length > 0 ? (
-              messages.messages.data.map((message, index) => {
-                const key = message._id || index;
-                const isSender = message.user.id === userData.id;
-              
-                return (
-                  <>
-                    <div
-                      key={key}
-                      className={`max-w-[60%] mt-4 ${isSender ? 'ml-auto bg-blue-500 text-white' : 'bg-white'} p-4 rounded-xl shadow-md`}
-                    >
-                      {message.message}
-                    </div>
-                    <div ref={messageRef}></div>
-                  </>
-                );
-              })
-            ) : (
-              <div className="text-center text-lg mt-28 font-semibold">No Messages</div>
-            )}
+          {messages?.messages?.data?.length > 0 ? (
+  messages.messages.data.map((message, index) => {
+    const key = message._id || index;
+    const isSender = message.user.id === userData.id;
+
+    const timestamp = new Date(message.timestamp).toLocaleTimeString(); // Format the timestamp
+
+    return (
+      <>
+        <div
+          key={key}
+          className={`max-w-[60%] mt-4 ${isSender ? 'ml-auto bg-blue-500 text-white' : 'bg-white'} p-4 rounded-xl shadow-md`}
+        >
+          {message.message}
+          <div className={`text-xs  ${isSender ? 'text-white' : 'text-gray-500'} text-right`}>{timestamp}</div> 
+        </div>
+        
+        <div ref={messageRef}></div>
+      </>
+    );
+  })
+) : (
+  <div className="text-center text-lg mt-28 font-semibold">No Messages</div>
+)}
+
           </div>
         </div>
           
         {/* Input panel */}
         {selectedName && (
-          <div className="fixed bottom-0 w-full sm:w-[80%] lg:w-[70%] h-[12%] bg-white border-t-[1.5px] shadow-md flex items-center px-6">
+          <div id="sendText" className="fixed bottom-0 w-full sm:w-[80%] lg:w-[70%] h-[12%] bg-white border-t-[1.5px] shadow-md flex items-center px-6">
             <input
               value={typedText}
               onChange={(e) => setTypedText(e.target.value)}

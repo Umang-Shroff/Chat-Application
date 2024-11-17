@@ -32,45 +32,89 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // SOCKET.IO
-let users = []
-io.on('connection', socket => {
-    console.log('User Connected ', socket.id)
+let users = [];          // Array to track connected users
+let userStatus = {};     // Object to track users' online/offline status
 
-    // Adding a user to the users array
+io.on('connection', socket => {
+    console.log('User Connected ', socket.id);
+
+    // Get the userId from the socket handshake query
+    const userId = socket.handshake.query.userId;
+
+    // Initially set the user status to 'online'
+    userStatus[userId] = 'online';
+
+    // Emit the updated status of all users to all connected clients
+    io.emit('updateUserStatus', userStatus);
+
+    // Add user to the online status tracker
     socket.on('addUser', userId => {
+        // Check if the user is already in the 'users' array
         const isUserExist = users.find(user => user.userId === userId);
         if (!isUserExist) {
-            const user = { userId, socketId: socket.id }  
+            // Add user to the users array
+            const user = { userId, socketId: socket.id };
             users.push(user);
-            io.emit('getUsers', users); 
+            userStatus[userId] = 'online'; // Set user as online
+
+            // Emit the updated user list and status to all clients
+            io.emit('getUsers', users);
+            io.emit('updateUserStatus', userStatus);
         }
-        console.log("users data: ", { users });
     });
 
+    // Listen for messages from users
     socket.on('sendMessage', async ({ conversationId, senderId, message, receiverId }) => {
+        // Find the sender and receiver users in the 'users' array
         const receiver = users.find(user => user.userId === receiverId);
         const sender = users.find(user => user.userId === senderId);
-        const user = await Users.findById(senderId)
+
+        // Ensure the sender exists
+        const user = await Users.findById(senderId);
+
         if (receiver && sender) {
-            // Emit the message to both the sender and receiver
+            // Create a new message and save it to the database
+            const newMessage = new Messages({
+                conversationId,
+                senderId,
+                message
+            });
+
+            await newMessage.save();
+
+            // Emit the message with timestamp to both sender and receiver
             io.to(receiver.socketId).to(sender.socketId).emit('getMessage', {
                 senderId,
                 message,
                 conversationId,
                 receiverId,
-                user: { id: user._id, name: user.name, email: user.email}
+                user: { id: user._id, name: user.name, email: user.email },
+                timestamp: newMessage.createdAt
             });
         }
     });
-    
-      
 
+    // Handle user disconnection
     socket.on('disconnect', () => {
-        users = users.filter(user => user.socketId !== socket.id);
-        io.emit('getUsers', users); 
-        console.log('User disconnected: ', socket.id);
+        const userIndex = users.findIndex(user => user.socketId === socket.id);
+        if (userIndex !== -1) {
+            const userId = users[userIndex].userId;
+
+            // Remove the user from the 'users' array
+            users.splice(userIndex, 1);
+
+            // Set the user's status to 'offline'
+            userStatus[userId] = 'offline';
+
+            // Emit the updated user status and list to all clients
+            io.emit('updateUserStatus', userStatus);
+            io.emit('getUsers', users);
+
+            console.log('User disconnected: ', socket.id);
+        }
     });
 });
+
 
 
 // ROUTES
@@ -246,22 +290,31 @@ app.post('/api/message', async (req, res) => {
 //     }
 // })
 
-app.get('/api/message/:conversationId', async(req,res)=>{
+app.get('/api/message/:conversationId', async (req, res) => {
     try {
         const conversationId = req.params.conversationId;
-        console.log("Convo Id: ",conversationId)
-        if(conversationId === 'new') {return res.status(200).json([]);}
+        if (conversationId === 'new') {
+            return res.status(200).json([]);
+        }
+
         const messages = await Messages.find({ conversationId });
-        console.log("Messages: ",{messages})
-        const messageUserData = Promise.all(messages.map(async (message) => {
+
+        const messageUserData = await Promise.all(messages.map(async (message) => {
             const user = await Users.findById(message.senderId);
-            return { user: { id: user._id, email: user.email, name: user.name }, message: message.message }
-        }))
-        res.status(200).json(await messageUserData)
+            return {
+                user: { id: user._id, email: user.email, name: user.name },
+                message: message.message,
+                timestamp: message.createdAt // Return the timestamp along with the message
+            };
+        }));
+
+        res.status(200).json(messageUserData);
     } catch (error) {
-        console.log("Error: ",error)
+        console.log("Error: ", error);
+        res.status(500).send("Internal Server Error");
     }
-})
+});
+
 
 app.get('/api/trial/:conversationId', async(req,res) => {
     try {
@@ -286,27 +339,6 @@ app.get('/api/users', async (req,res) => {
         console.log("Error: ",error)
     }
 })
-
-// app.post('/api/message', async(req,res)=>{
-//     try {
-//         const { conversationId, senderId, message, receiverId = ''} = req.body;
-//         if(!senderId || !message) return res.status(400).send("Please fill all required fields")
-//         if(!conversationId && receiverId){
-//             const newConversation = new Conversations({ members: [senderId, receiverId] });
-//             await newConversation.save();
-//             const newMessage = new Messages({ conversationId: newConversation._id, senderId, message });
-//             await newMessage.save();
-//             return res.status(200).send("Message sent successfully")
-//         }else if(!conversationId && !receiverId){
-//             return res.status(200).send("Please fill all required fields")
-//         }
-//         const newMessage = new Messages({ conversationId, senderId, message });
-//         await newMessage.save();
-//         res.status(200).send("Message sent successfully")
-//     } catch (error) {
-        
-//     }
-// })
 
 app.listen(PORT, (req,res)=>{
     console.log(`Listening on port ${PORT}`)

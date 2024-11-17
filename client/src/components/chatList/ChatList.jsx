@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import SearchIcon from '@mui/icons-material/Search';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import axios from 'axios';
 
 const ChatList = ({ convoData, onSelectChat }) => {
@@ -81,7 +82,7 @@ const ChatList = ({ convoData, onSelectChat }) => {
                       onSelectChat(conversationId, user?.name, user?.id);
                     }}
                   >
-                    <div className="w-10 h-10 bg-gray-300 rounded-full mr-3"></div>
+                    <div className="w-10 h-10 bg-gray-300 flex justify-center items-center rounded-full mr-3"><PersonOutlineOutlinedIcon/></div>
                     <div className="flex-1">
                       <div className="flex justify-between items-center">
                         <span className="font-semibold">{user?.name}</span>
