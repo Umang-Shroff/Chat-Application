@@ -4,9 +4,11 @@ const jwt = require('jsonwebtoken')
 const cors = require('cors')
 const io = require('socket.io')(8080,{
     cors: {
-        origin: 'https://chat-application-seven-eosin.vercel.app',
+        origin: 'https://chat-application-d6toix5oy-umang-shroffs-projects.vercel.app',
     }
 })
+
+const port = 'https://chat-application-3jzb.onrender.com';
 
 // DB CONNECTION
 require('./db/connection')
@@ -17,13 +19,13 @@ const Conversations = require('./models/Conversation');
 const Messages = require('./models/Messages');
 
 const app = express();
-const PORT = process.env.PORT || 8000;
+const PORT = port || 8000;
 
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
 
 const corsOptions = {
-    origin: 'https://chat-application-seven-eosin.vercel.app', 
+    origin: 'https://chat-application-d6toix5oy-umang-shroffs-projects.vercel.app', 
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization'], 
