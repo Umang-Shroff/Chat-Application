@@ -2,6 +2,11 @@ const express = require('express');
 const bcryptjs = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const cors = require('cors')
+const io = require('socket.io')(8080,{
+    cors: {
+        origin: 'http://localhost:3000',
+    }
+})
 
 // DB CONNECTION
 require('./db/connection')
@@ -25,6 +30,10 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+// SOCKET.IO
+io.on
+
 
 // ROUTES
 
