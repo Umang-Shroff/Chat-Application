@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import ChatList from '../chatList/ChatList'
 import ChatText from '../chatContent/ChatText'
 import axios from 'axios';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
 
 const Dashboard = () => {
+
 
   useEffect(()=>{
     const fetchData = JSON.parse(localStorage.getItem('user:detail'))
@@ -36,7 +37,7 @@ const Dashboard = () => {
     const resx = await axios.get(`/api/message/${selectedChat}`)
     // console.log("RESPONSE IN CHAT-TEXT:::::  ",resx.data)
     // setMessages(resx.data)
-    setMessages({messages: resx, receiver: name, selectedChat})
+    setMessages({messages: resx})
     console.log("MESSAGE IS BELOW:")
     console.log(messages)
   };
@@ -53,7 +54,7 @@ const Dashboard = () => {
   const sendMessage = async () => {
     try {
       // convoName={selectedName} receiverId={selectedId} senderName={userData.id} convoId={selectedChat} showMessage={messages}
-      const res = await axios.post('/api/message',{ conversationId:selectedName ,senderId:userData.id, message:typedText, receiverId:selectedId})
+      const res = await axios.post('/api/message',{ conversationId:selectedChat ,senderId:userData.id, message:typedText, receiverId:selectedId})
       console.log("New message typed: ",res);
       setTypedText('')
     } catch (error) {
@@ -126,9 +127,8 @@ const Dashboard = () => {
         <div className="overflow-y-auto h-[70vh] px-6 relative z-10">
         {
           messages.messages?.data?.length > 0 ? 
-          messages.messages?.data.map((message, index) => {  // Add index as the second parameter
-            // Use message._id if available or index if not
-            const key = message._id || index;  // Use message._id or fallback to index
+          messages.messages?.data.map((message, index) => {  
+            const key = message._id || index;  
           
             if (message.user.name === selectedName) {
               return (
@@ -153,7 +153,7 @@ const Dashboard = () => {
           <input value={typedText} onChange={(e)=>setTypedText(e.target.value)} className="h-12 border border-gray-300 focus:border-0 outline-gray-300 rounded-lg px-6 w-[80%] bg-gray-100 text-black" type="text" placeholder="Type a message..." />
           {typedText.length > 0 ? <button onClick={()=>sendMessage()} type="submit" className="ml-4 w-12 h-12 flex items-center justify-center border rounded-full bg-blue-500 hover:bg-blue-400">
             <SendRoundedIcon className="text-white" />
-          </button> : <button disabled onClick={()=>sendMessage()} type="submit" className="ml-4 w-12 h-12 flex items-center justify-center border rounded-full bg-blue-500">
+          </button> : <button disabled type="submit" className="ml-4 w-12 h-12 flex items-center justify-center border rounded-full bg-blue-500">
             <SendRoundedIcon className="text-white" />
           </button>}
         </div>
