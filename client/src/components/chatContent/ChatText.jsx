@@ -1,33 +1,33 @@
-import React, { useEffect, useState } from 'react'
-import SendRoundedIcon from '@mui/icons-material/SendRounded';
-import axios from 'axios';
+// import React, { useEffect, useState } from 'react'
+// import SendRoundedIcon from '@mui/icons-material/SendRounded';
+// import axios from 'axios';
 
-const ChatText = ({ convoName, receiverId, senderName, convoId, showMessage }) => {
+// const ChatText = ({ convoName, receiverId, senderName, convoId, showMessage }) => {
 
-  const [typedText, setTypedText] = useState('');
-  const [messagesArray, setMessagesArray] = useState(showMessage)
+//   const [typedText, setTypedText] = useState('');
+//   const [messagesArray, setMessagesArray] = useState(showMessage)
 
-  // console.log("SLEEEEEEP::: ",messagesArray)
+//   // console.log("SLEEEEEEP::: ",messagesArray)
 
-  const sendMessage = async () => {
-    try {
-      const res = await axios.post('/api/message',{ conversationId:convoId ,senderId:senderName, message:typedText, receiverId:receiverId})
-      console.log("New message typed: ",res);
-      setTypedText('')
-    } catch (error) {
-      console.log("Error in posting new message: ",error)
-    }
-  }
+//   const sendMessage = async () => {
+//     try {
+//       const res = await axios.post('/api/message',{ conversationId:convoId ,senderId:senderName, message:typedText, receiverId:receiverId})
+//       console.log("New message typed: ",res);
+//       setTypedText('')
+//     } catch (error) {
+//       console.log("Error in posting new message: ",error)
+//     }
+//   }
 
-  // console.log("showMessage: ",messagesArray)
+//   // console.log("showMessage: ",messagesArray)
 
 
-  return (
-    <>
+//   return (
+//     <>
       
       
-    </>
-  )
-}
+//     </>
+//   )
+// }
 
-export default ChatText
+// export default ChatText
