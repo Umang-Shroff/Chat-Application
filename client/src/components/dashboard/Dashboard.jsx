@@ -55,7 +55,7 @@ const Dashboard = () => {
   const [socket, setSocket] = useState(null);
   // const [users, setUsers] = useState([]);
   // const [activeUsers, setActiveUsers] = useState([]);
-  const [setActiveUsers] = useState([]);
+  // const [setActiveUsers] = useState([]);
 
   const [selectedChat, setSelectedChat] = useState(null);
   const [selectedName, setSelectedName] = useState('');
@@ -66,7 +66,7 @@ const Dashboard = () => {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [typedText, setTypedText] = useState('');
   const [allUsers, setAllUsers] = useState([]);
-
+  console.log(setUserData)
   useEffect(() => {
     if (!socket || !userData?.id) return;
 
@@ -116,31 +116,31 @@ const Dashboard = () => {
   }, []);
 
   // Listen to socket messages
-  useEffect(() => {
-    if (socket) {
-      socket.emit('addUser', userData?.id);
+  // useEffect(() => {
+  //   if (socket) {
+  //     socket.emit('addUser', userData?.id);
   
-      socket.on('getUsers', (users) => {
-        setActiveUsers(users);
-      });
+  //     socket.on('getUsers', (users) => {
+  //       setActiveUsers(users);
+  //     });
   
-      socket.on('getMessage', (data) => {
-        setMessages((prevState) => {
-          const newMessages = prevState?.messages?.data
-            ? [...prevState.messages.data, { user: data.user, message: data.message }]
-            : [{ user: data.user, message: data.message }];
-          return { ...prevState, messages: { ...prevState.messages, data: newMessages } };
-        });
-      });
-    }
+  //     socket.on('getMessage', (data) => {
+  //       setMessages((prevState) => {
+  //         const newMessages = prevState?.messages?.data
+  //           ? [...prevState.messages.data, { user: data.user, message: data.message }]
+  //           : [{ user: data.user, message: data.message }];
+  //         return { ...prevState, messages: { ...prevState.messages, data: newMessages } };
+  //       });
+  //     });
+  //   }
   
-    return () => {
-      if (socket) {
-        socket.off('getUsers');
-        socket.off('getMessage');
-      }
-    };
-  }, [socket, userData]);
+  //   return () => {
+  //     if (socket) {
+  //       socket.off('getUsers');
+  //       socket.off('getMessage');
+  //     }
+  //   };
+  // }, [socket, userData]);
   
 
   const handleSelectChat = async (chatId, name, id) => {
