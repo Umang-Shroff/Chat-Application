@@ -20,7 +20,11 @@ const Dashboard = () => {
     fetchTalks()
   },[])
 
-  
+
+  // useEffect(()=>{
+
+  // },[allUsers])
+
 
   const handleSelectChat = async (chatId, name, id) => {
     setSelectedChat();
@@ -48,8 +52,20 @@ const Dashboard = () => {
   const [userData, setUserData] = useState(JSON.parse(localStorage.getItem('user:detail')));
   const [talks, setTalks] = useState([])
   const [messages, setMessages] = useState([]);
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   const [typedText, setTypedText] = useState('');
+  const [allUsers, setAllUsers] = useState([])
+
+
+  const openPanel = () => {
+    setIsPanelOpen(true);
+  };
+
+  const closePanel = () => {
+    setIsPanelOpen(false);
+  };
+
 
   const sendMessage = async () => {
     try {
@@ -67,31 +83,70 @@ const Dashboard = () => {
   // console.log("Selected name id: ", selectedName)
   // console.log("ReceiverId: ",selectedId)
   return (
-    <div className="w-screen flex">
-      <div className="w-[8%] flex justify-center border h-screen bg-white">
-        <div className="absolute bottom-10 flex flex-col justify-center items-center space-y-4">
+    <div className="w-screen flex overflow-hidden">
+      <div className="w-[8%] flex justify-center border h-screen bg-white relative">
+      <div className="flex items-center flex-col pt-6 w-24 h-screen border-gray-300 border-r-2">
 
-          <p className="font-semibold">{userData?.name}</p>
-          {/* Profile Image */}
-          <div className="border border-blue-700 p-[2px] relative bottom-3 rounded-full">
-            <img className="bg-blue-300 border w-14 rounded-full" src="" width={75} height={75}/>    
-          </div>
-
-          {/* Logout Button */}
-          <button
-            onClick={() => {
-              localStorage.removeItem('user:token');
-              localStorage.removeItem('user:detail');
-              alert("You have been logged out.");
-              window.location.href = '/login'; 
-            }}
-            className="border rounded-lg p-2 mt-4 bg-blue-500 text-white hover:bg-blue-600 focus:outline-none"
-          >
-            Logout
-          </button>
-          
+        <div className={'flex justify-center border rounded-lg bg-blue-700 h-16 w-16 mb-4'}>
+          {/* image */}
         </div>
+
+        {/* Chat Icon 1 */}
+        <div className={'h-12 w-12 bg-blue-400 border mt-6 rounded-lg cursor-pointer'}>
+          {/* Chat Icon 1 */}
+        </div>
+
+        {/* Chat Icon 2 that opens the panel */}
+        <div
+          className={'h-12 w-12 bg-blue-400 border mt-6 rounded-lg cursor-pointer'}
+          onClick={openPanel}
+        >
+          {/* Chat Icon 2 */}
+        </div>
+
+        {/* Panel */}
+        <div
+          className={`fixed top-0 left-0 h-full w-72 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
+            isPanelOpen ? 'translate-x-0' : '-translate-x-full'
+          } z-50`} // Added high z-index value for the panel
+        >
+          <div className="flex justify-end p-4">
+            {/* Close Button */}
+            <button onClick={closePanel} className="text-xl font-bold">
+              X
+            </button>
+          </div>
+          {/* Content inside the panel */}
+          <div className="p-6">
+            <h2 className="text-lg font-semibold">Panel Content</h2>
+            {/* Add content you want here */}Hello
+          </div>
+        </div>
+
       </div>
+
+      {/* Bottom Section */}
+      <div className="absolute bottom-10 flex flex-col justify-center items-center space-y-4 z-10">
+        <p className="font-semibold">User Name</p>
+        {/* Profile Image */}
+        <div className="border border-blue-700 p-[2px] relative bottom-3 rounded-full">
+          <img className="bg-blue-300 border w-14 rounded-full" src="" width={75} height={75} />
+        </div>
+
+        {/* Logout Button */}
+        <button
+          onClick={() => {
+            localStorage.removeItem('user:token');
+            localStorage.removeItem('user:detail');
+            alert("You have been logged out.");
+            window.location.href = '/login';
+          }}
+          className="border rounded-lg p-2 mt-4 bg-blue-500 text-white hover:bg-blue-600 focus:outline-none"
+        >
+          Logout
+        </button>
+      </div>
+    </div>
           
       <div className="w-[27%] border overflow-y-scroll overflow-x-hidden h-screen">
         <ChatList 
