@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken')
 const cors = require('cors')
 const io = require('socket.io')(8080,{
     cors: {
-        origin: 'https://chat-application-d6toix5oy-umang-shroffs-projects.vercel.app',
+        origin: 'https://chat-application-seven-eosin.vercel.app',
     }
 })
 
@@ -25,7 +25,7 @@ app.use(express.json())
 app.use(express.urlencoded({extended: false}))
 
 const corsOptions = {
-    origin: 'https://chat-application-d6toix5oy-umang-shroffs-projects.vercel.app', 
+    origin: 'https://chat-application-seven-eosin.vercel.app', 
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization'], 
