@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
 
 
 const RegisterPage = () => {
@@ -16,17 +17,17 @@ const RegisterPage = () => {
             console.log("Data sent: ",{name, email, password})
             await axios.post('/api/register',{ name, email, password })
             console.log("Data registered: ",{name, email, password})
-            alert("Success registered")
+            toast.success("Success registered")
             navigate('/login')
         } catch (error) {
             console.log('Error on RegisterPage client: ',error)
-            alert("Error: ",error)
+            toast.error("Error: ",error)
         }
     }
 
     return (
         <>
-        {/* <Toaster/> */}
+        <Toaster/>
         <div className="relative flex items-center justify-center min-h-screen bg-gray-100">
   {/* Background Blurred Circles */}
   <div className="absolute w-72 h-72 bg-[rgba(79,70,229,0.35)] rounded-full blur-[100px] top-10 left-10 sm:w-96 sm:h-96 md:w-[350px] md:h-[350px] lg:w-72 lg:h-72"></div>

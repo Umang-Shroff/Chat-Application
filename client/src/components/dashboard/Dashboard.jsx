@@ -8,6 +8,8 @@ import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import PeopleOutlineOutlinedIcon from '@mui/icons-material/PeopleOutlineOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 
+import toast, { Toaster } from 'react-hot-toast';
+
 import IntroJs from 'intro.js';
 import 'intro.js/introjs.css';
 
@@ -225,6 +227,8 @@ const Dashboard = () => {
   };
 
   return (
+    <>
+    <Toaster/>
     <div className="w-screen flex overflow-hidden">
       {/* Sidebar */}
       <div className="w-full sm:w-[8%] flex justify-center border h-screen bg-white relative">
@@ -397,6 +401,7 @@ const Dashboard = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

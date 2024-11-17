@@ -3,6 +3,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import axios from 'axios';
+import toast, { Toaster } from 'react-hot-toast';
 
 const ChatList = ({ convoData, onSelectChat }) => {
   const [isSearching, setIsSearching] = useState(false);
@@ -31,6 +32,8 @@ const ChatList = ({ convoData, onSelectChat }) => {
   });
 
   return (
+    <>
+    <Toaster/>
     <div className="w-full sm:w-80 mx-auto font-sans text-gray-800">
   <header className="flex justify-between items-center p-6 border-b-[1.5px] bg-white shadow-md">
     {isSearching ? (
@@ -98,7 +101,7 @@ const ChatList = ({ convoData, onSelectChat }) => {
     </div>
   </div>
 </div>
-
+</>
   );
 }
 

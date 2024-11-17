@@ -1,6 +1,5 @@
 import './App.css';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import SideBar from './components/sidebar/SideBar';
 import ChatList from './components/chatList/ChatList';
 import Dashboard from './components/dashboard/Dashboard';
 import LoginPage from './pages/login/LoginPage';
@@ -41,8 +40,6 @@ function App() {
               <RegisterPage/>
             </ProtectedRoute>
           }/>
-          <Route path='/chat' element={<SideBar/>}/>
-          {/* <Route path='/list' element={}/> */}
         </Routes>
       </BrowserRouter>
     </>

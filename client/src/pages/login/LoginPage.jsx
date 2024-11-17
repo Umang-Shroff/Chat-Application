@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios';
 import {  useNavigate } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
 
 const LoginPage = () => {
 
@@ -19,18 +20,18 @@ const LoginPage = () => {
             if(resp.data.token){
                 localStorage.setItem('user:token',JSON.stringify(resp.data.token))
                 localStorage.setItem('user:detail',JSON.stringify(resp.data.user))
+                toast.success('Logged In')
                 navigate('/')
             }
         } catch (error) {
             console.log('Error on LoginPage client: ',error)
+            toast.error("Error logging In")
         }
     }
 
     return (
         <>
-        {/* <Toaster
-            position="bottom-right"
-        /> */}
+        <Toaster/>
        <div className="relative flex items-center justify-center min-h-screen bg-gray-100">
   <div className="absolute w-72 h-72 bg-[rgba(79,70,229,0.35)] rounded-full blur-[100px] top-10 left-10 sm:w-96 sm:h-96 md:w-[350px] md:h-[350px] lg:w-72 lg:h-72"></div>
   <div className="absolute w-96 h-96 bg-[rgba(79,70,229,0.35)] rounded-full blur-[100px] top-1/2 right-10 sm:w-[400px] sm:h-[400px] md:w-[450px] md:h-[450px] lg:w-96 lg:h-96"></div>
