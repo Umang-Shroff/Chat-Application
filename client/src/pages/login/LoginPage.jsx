@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import axios from 'axios';
 import {  useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
@@ -9,7 +9,6 @@ const LoginPage = () => {
 
     const [email,setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [redirect, setRedirect] = useState(false);
 
     const loginHandle = async (e) => {
         e.preventDefault()

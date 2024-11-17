@@ -8,7 +8,7 @@ import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import PeopleOutlineOutlinedIcon from '@mui/icons-material/PeopleOutlineOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 
-import toast, { Toaster } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
 
 import IntroJs from 'intro.js';
 import 'intro.js/introjs.css';
@@ -234,7 +234,7 @@ const Dashboard = () => {
       <div className="w-full sm:w-[8%] flex justify-center border h-screen bg-white relative">
         <div className="flex items-center flex-col pt-6 w-24 sm:w-24 lg:w-24 h-screen border-gray-300 border-r-2">
           <div className="flex justify-center border rounded-lg bg-blue-400 h-16 w-16 mb-4">
-            <img src={`${process.env.PUBLIC_URL}/assets/imgs/icons8-telegram-app-100.png`} alt="My Image" />
+            <img src={`${process.env.PUBLIC_URL}/assets/imgs/icons8-telegram-app-100.png`} />
           </div>
 
           <div id="allchat" className="h-12 w-12 bg-blue-200 border flex hover:bg-blue-300 justify-center items-center mt-6 rounded-lg cursor-pointer">

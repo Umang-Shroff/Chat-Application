@@ -2,13 +2,11 @@ import React, { useState } from 'react'
 import SearchIcon from '@mui/icons-material/Search';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-import axios from 'axios';
-import toast, { Toaster } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
 
 const ChatList = ({ convoData, onSelectChat }) => {
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [messages, setMessages] = useState('');
 
   function handleSearch() {
     setIsSearching(true);

@@ -1,6 +1,5 @@
 import './App.css';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import ChatList from './components/chatList/ChatList';
 import Dashboard from './components/dashboard/Dashboard';
 import LoginPage from './pages/login/LoginPage';
 import RegisterPage from './pages/register/RegisterPage';
