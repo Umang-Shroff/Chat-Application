@@ -32,7 +32,45 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // SOCKET.IO
-io.on
+let users = []
+io.on('connection', socket => {
+    console.log('User Connected ', socket.id)
+
+    // Adding a user to the users array
+    socket.on('addUser', userId => {
+        const isUserExist = users.find(user => user.userId === userId);
+        if (!isUserExist) {
+            const user = { userId, socketId: socket.id }  
+            users.push(user);
+            io.emit('getUsers', users); 
+        }
+        console.log("users data: ", { users });
+    });
+
+    socket.on('sendMessage', async ({ conversationId, senderId, message, receiverId }) => {
+        const receiver = users.find(user => user.userId === receiverId);
+        const sender = users.find(user => user.userId === senderId);
+        const user = await Users.findById(senderId)
+        if (receiver && sender) {
+            // Emit the message to both the sender and receiver
+            io.to(receiver.socketId).to(sender.socketId).emit('getMessage', {
+                senderId,
+                message,
+                conversationId,
+                receiverId,
+                user: { id: user._id, name: user.name, email: user.email}
+            });
+        }
+    });
+    
+      
+
+    socket.on('disconnect', () => {
+        users = users.filter(user => user.socketId !== socket.id);
+        io.emit('getUsers', users); 
+        console.log('User disconnected: ', socket.id);
+    });
+});
 
 
 // ROUTES
