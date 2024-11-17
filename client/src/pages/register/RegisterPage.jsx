@@ -34,6 +34,15 @@ const RegisterPage = () => {
   <div className="absolute w-96 h-96 bg-[rgba(79,70,229,0.35)] rounded-full blur-[100px] top-1/2 right-10 sm:w-[400px] sm:h-[400px] md:w-[450px] md:h-[450px] lg:w-96 lg:h-96"></div>
   <div className="absolute w-48 h-48 bg-[rgba(79,70,229,0.35)] rounded-full blur-[100px] bottom-10 left-1/2 transform -translate-x-1/2 sm:w-72 sm:h-72 md:w-[250px] md:h-[250px] lg:w-48 lg:h-48"></div>
 
+{/* Trial login info */}
+<div className="absolute mt-2 border rounded-lg top-0 left-1/2 transform -translate-x-1/2 p-4 bg-blue-400 text-white text-sm sm:text-base text-center w-auto">
+  <p>
+    <strong>Trial Login Info:</strong><br />
+    <span>Email: helz@gmail.com</span><br />
+    <span>Password: helz</span>
+  </p>
+</div>
+
   {/* Register Form */}
   <div className="relative bg-white p-8 rounded-lg shadow-xl z-10 w-full max-w-md">
     <h1 className="text-3xl sm:text-4xl text-center mb-6 text-blue-700 font-semibold">Register</h1>
