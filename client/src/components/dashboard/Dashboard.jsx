@@ -34,14 +34,19 @@ const Dashboard = () => {
     setSelectedName(name);
     setSelectedId(id)
 
-    console.log("Selected chat: ",selectedChat, "Selected ID: ",selectedId)
+    console.log("Selected chat: ",selectedChat, "Selected ID (receiver id): ",selectedId)
+    console.log("Chat id is (new or not):: ",chatId)
+    if(chatId === 'new'){await sendMessage()}
+    else{
+      const resx = await axios.get(`/api/message/${selectedChat}`)
+      // console.log("RESPONSE IN CHAT-TEXT:::::  ",resx.data)
+      // setMessages(resx.data)
+      setMessages({messages: resx})
+      console.log("MESSAGE IS BELOW:")
+      console.log(messages)
+    }
 
-    const resx = await axios.get(`/api/message/${selectedChat}`)
-    // console.log("RESPONSE IN CHAT-TEXT:::::  ",resx.data)
-    // setMessages(resx.data)
-    setMessages({messages: resx})
-    console.log("MESSAGE IS BELOW:")
-    console.log(messages)
+    
   };
 
   const [selectedChat, setSelectedChat] = useState(null);
@@ -57,8 +62,8 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const respx = await axios.get('/api/users'); // Make API call to fetch users
-      setAllUsers(respx.data); // Set the fetched users in the state
+      const respx = await axios.get('/api/users'); 
+      setAllUsers(respx.data); 
     };
     fetchUsers();
   }, []);
@@ -74,9 +79,14 @@ const Dashboard = () => {
 
   const sendMessage = async () => {
     try {
+      console.log("BEFORE POST REQUST:  ",{ conversationId:selectedChat ,senderId:userData.id, message:typedText, receiverId:selectedId})
       // convoName={selectedName} receiverId={selectedId} senderName={userData.id} convoId={selectedChat} showMessage={messages}
-      const res = await axios.post('/api/message',{ conversationId:selectedChat ,senderId:userData.id, message:typedText, receiverId:selectedId})
-      console.log("New message typed: ",res);
+      if(selectedChat!=='new'){
+        await axios.post('/api/message',{ conversationId:selectedChat ,senderId:userData.id, message:typedText, receiverId:selectedId})
+      }else{
+        await axios.post('/api/message',{ conversationId:selectedChat ,senderId:userData.id, message:'Hi', receiverId:selectedId})
+      }
+      // console.log("New message typed: ",res);
       setTypedText('')
     } catch (error) {
       console.log("Error in posting new message: ",error)
@@ -116,19 +126,17 @@ const Dashboard = () => {
           } z-50`} // Added high z-index value for the panel
         >
           <div className="flex justify-end p-4">
-            {/* Close Button */}
             <button onClick={closePanel} className="text-xl font-bold">
               X
             </button>
           </div>
-          {/* Content inside the panel */}
           <div className="p-6">
-            <h2 className="text-lg font-semibold">Panel Content</h2>
+            <h2 className="text-lg font-semibold">All Contacts</h2>
 
               {
                 allUsers.map(({ userId, user, index }) => {
                   // Use conversationId as the key, if available; otherwise fallback to index
-                  const key = userId || index;
+                  const key = index || userId;
                 
                   return (
                     <div key={key} className="border-b-[1.5px] cursor-pointer">
@@ -136,7 +144,7 @@ const Dashboard = () => {
                         className="mt-2 flex items-center rounded-lg p-3 mb-2 hover:bg-gray-100"
                         onClick={() => {
                           console.log("userName selected: ", user);
-                          handleSelectChat('new', user?.name, user?.id);
+                          handleSelectChat('new', user?.name, user?.receiverId);
                         }}
                       >
                         <div className="w-10 h-10 bg-gray-300 rounded-full mr-3"></div>
@@ -161,7 +169,7 @@ const Dashboard = () => {
 
       {/* Bottom Section */}
       <div className="absolute bottom-10 flex flex-col justify-center items-center space-y-4 z-10">
-        <p className="font-semibold">User Name</p>
+        <p className="font-semibold">{userData.name}</p>
         {/* Profile Image */}
         <div className="border border-blue-700 p-[2px] relative bottom-3 rounded-full">
           <img className="bg-blue-300 border w-14 rounded-full" src="" width={75} height={75} />

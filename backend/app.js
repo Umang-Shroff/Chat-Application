@@ -119,7 +119,7 @@ app.post('/api/message',async (req,res) => {
         const { conversationId, senderId, message, receiverId } = req.body;
         console.log({conversationId, senderId, message, receiverId})
         if(!senderId || !message){ console.log("!sender || !msg"); return res.status(400).send("Please fill all fields")}
-        if(!conversationId && receiverId){
+        if(conversationId==='new' && receiverId){
             console.log("!conversationId && receiverId");
             const newConversation = new Conversations({ members:[senderId, receiverId] });
             await newConversation.save();
@@ -171,7 +171,7 @@ app.get('/api/users', async (req,res) => {
     try {
         const users = await Users.find();
         const usersData = Promise.all(users.map(async (user) => {
-            return { user: { email: user.email, name: user.name }, userId: user._id }
+            return { user: { email: user.email, name: user.name, receiverId: user._id } }
         }))
         res.status(200).json(await usersData);
     } catch (error) {
