@@ -21,9 +21,7 @@ const Dashboard = () => {
   },[])
 
 
-  // useEffect(()=>{
-
-  // },[allUsers])
+  
 
 
   const handleSelectChat = async (chatId, name, id) => {
@@ -57,6 +55,13 @@ const Dashboard = () => {
   const [typedText, setTypedText] = useState('');
   const [allUsers, setAllUsers] = useState([])
 
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const respx = await axios.get('/api/users'); // Make API call to fetch users
+      setAllUsers(respx.data); // Set the fetched users in the state
+    };
+    fetchUsers();
+  }, []);
 
   const openPanel = () => {
     setIsPanelOpen(true);
@@ -119,7 +124,36 @@ const Dashboard = () => {
           {/* Content inside the panel */}
           <div className="p-6">
             <h2 className="text-lg font-semibold">Panel Content</h2>
-            {/* Add content you want here */}Hello
+
+              {
+                allUsers.map(({ userId, user, index }) => {
+                  // Use conversationId as the key, if available; otherwise fallback to index
+                  const key = userId || index;
+                
+                  return (
+                    <div key={key} className="border-b-[1.5px] cursor-pointer">
+                      <div
+                        className="mt-2 flex items-center rounded-lg p-3 mb-2 hover:bg-gray-100"
+                        onClick={() => {
+                          console.log("userName selected: ", user);
+                          handleSelectChat('new', user?.name, user?.id);
+                        }}
+                      >
+                        <div className="w-10 h-10 bg-gray-300 rounded-full mr-3"></div>
+                        <div className="flex-1">
+                          <div className="flex justify-between items-center">
+                            <span className="font-semibold">{user?.name}</span>
+                            <span className="text-xs text-gray-500">{user?.email}</span>
+                          </div>
+                          {/* <div className="text-sm text-gray-600">{message}</div> */}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              }
+
+
           </div>
         </div>
 
