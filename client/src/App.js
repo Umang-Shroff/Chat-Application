@@ -5,7 +5,7 @@ import LoginPage from './pages/login/LoginPage';
 import RegisterPage from './pages/register/RegisterPage';
 import axios from 'axios';
 
-axios.defaults.baseURL = 'http://localhost:8000';
+axios.defaults.baseURL = 'https://chat-application-3jzb.onrender.com';
 
 const ProtectedRoute = ({ children, auth = false }) => {
   const isLoggedIn = localStorage.getItem('user:token') !== null || false;
