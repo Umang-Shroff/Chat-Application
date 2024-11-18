@@ -1,12 +1,13 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import SearchIcon from '@mui/icons-material/Search';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import { Toaster } from 'react-hot-toast';
 
-const ChatList = ({ convoData, onSelectChat }) => {
+const ChatList = ({ setOnline, convoData, onSelectChat, typingCheck }) => {
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [userData, setUserData] = useState(JSON.parse(localStorage.getItem('user:detail')));
 
   function handleSearch() {
     setIsSearching(true);
@@ -17,6 +18,9 @@ const ChatList = ({ convoData, onSelectChat }) => {
     setSearchQuery('');
   }
 
+  useEffect(()=>{
+    setUserData(userData)
+  },[userData])
   // To track the unique users
   const seenUsers = new Set();
 
@@ -79,15 +83,22 @@ const ChatList = ({ convoData, onSelectChat }) => {
                   <div
                     className="mt-2 flex items-center rounded-lg p-3 mb-2 hover:bg-gray-100"
                     onClick={() => {
-                      console.log("userName selected: ", user);
+                      // console.log("userName selected: ", user);
                       onSelectChat(conversationId, user?.name, user?.id);
                     }}
                   >
                     <div className="w-10 h-10 bg-gray-300 flex justify-center items-center rounded-full mr-3"><PersonOutlineOutlinedIcon/></div>
                     <div className="flex-1">
                       <div className="flex justify-between items-center">
+                        <div className='flex flex-col'>
                         <span className="font-semibold">{user?.name}</span>
-                        <span className="text-xs text-gray-500">{user?.email}</span>
+                        {typingCheck?.userId && typingCheck?.userId !== userData.id && typingCheck?.conversationId === conversationId
+                ? <span className="text-sm text-blue-500">Typing...</span>
+                : <span className="text-sm text-gray-500">{userData.email}</span>}                
+                  {/* <span className="text-sm text-gray-500">{userData.email}</span> */}
+                        {/* <span className="text-xs text-gray-500">{user?.email}</span> */}
+                        </div>
+                        <span className={`text-xs ${setOnline.some(x => x.userId === user?.id) ? 'text-green-500 font-semibold':'text-gray-500' }`}>{ setOnline.some(x => x.userId === user?.id) ? 'Online' : 'Offline' }</span>
                       </div>
                     </div>
                   </div>

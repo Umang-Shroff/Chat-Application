@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken')
 const cors = require('cors')
 const io = require('socket.io')(8080,{
     cors: {
-        origin: 'https://chat-application-seven-eosin.vercel.app',
+        origin: ['https://chat-application-seven-eosin.vercel.app','http://localhost:3000']
     }
 })
 
@@ -25,7 +25,7 @@ app.use(express.json())
 app.use(express.urlencoded({extended: false}))
 
 const corsOptions = {
-    origin: 'https://chat-application-seven-eosin.vercel.app', 
+    origin: ['https://chat-application-seven-eosin.vercel.app','http://localhost:3000'], 
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization'], 
@@ -34,48 +34,35 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // SOCKET.IO
-let users = [];          // Array to track connected users
-let userStatus = {};     // Object to track users' online/offline status
+let users = [];       
 
 io.on('connection', socket => {
     console.log('User Connected ', socket.id);
-
-    // Get the userId from the socket handshake query
+ 
     const userId = socket.handshake.query.userId;
-
-    // Initially set the user status to 'online'
-    userStatus[userId] = 'online';
-
-    // Emit the updated status of all users to all connected clients
-    io.emit('updateUserStatus', userStatus);
-
-    // Add user to the online status tracker
-    socket.on('addUser', userId => {
-        // Check if the user is already in the 'users' array
+ 
+    socket.on('addUser', userId => { 
         const isUserExist = users.find(user => user.userId === userId);
-        if (!isUserExist) {
-            // Add user to the users array
+        if (!isUserExist) { 
             const user = { userId, socketId: socket.id };
-            users.push(user);
-            userStatus[userId] = 'online'; // Set user as online
-
-            // Emit the updated user list and status to all clients
+            users.push(user); 
+ 
             io.emit('getUsers', users);
-            io.emit('updateUserStatus', userStatus);
+            console.log("Users currently Online: ",users) 
         }
     });
 
-    // Listen for messages from users
-    socket.on('sendMessage', async ({ conversationId, senderId, message, receiverId }) => {
-        // Find the sender and receiver users in the 'users' array
+    socket.on('typing', ({ userId, conversationId }) => { 
+        socket.broadcast.emit('typingReceieve', { userId, conversationId }); 
+    });
+ 
+    socket.on('sendMessage', async ({ conversationId, senderId, message, receiverId }) => { 
         const receiver = users.find(user => user.userId === receiverId);
         const sender = users.find(user => user.userId === senderId);
-
-        // Ensure the sender exists
+ 
         const user = await Users.findById(senderId);
 
-        if (receiver && sender) {
-            // Create a new message and save it to the database
+        if (receiver && sender) { 
             const newMessage = new Messages({
                 conversationId,
                 senderId,
@@ -83,8 +70,7 @@ io.on('connection', socket => {
             });
 
             await newMessage.save();
-
-            // Emit the message with timestamp to both sender and receiver
+ 
             io.to(receiver.socketId).to(sender.socketId).emit('getMessage', {
                 senderId,
                 message,
@@ -95,21 +81,14 @@ io.on('connection', socket => {
             });
         }
     });
-
-    // Handle user disconnection
+ 
     socket.on('disconnect', () => {
         const userIndex = users.findIndex(user => user.socketId === socket.id);
         if (userIndex !== -1) {
             const userId = users[userIndex].userId;
-
-            // Remove the user from the 'users' array
+ 
             users.splice(userIndex, 1);
-
-            // Set the user's status to 'offline'
-            userStatus[userId] = 'offline';
-
-            // Emit the updated user status and list to all clients
-            io.emit('updateUserStatus', userStatus);
+ 
             io.emit('getUsers', users);
 
             console.log('User disconnected: ', socket.id);

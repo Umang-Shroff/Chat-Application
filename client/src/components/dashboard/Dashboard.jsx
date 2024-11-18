@@ -54,7 +54,7 @@ const Dashboard = () => {
 
   const [socket, setSocket] = useState(null);
   // const [users, setUsers] = useState([]);
-  // const [activeUsers, setActiveUsers] = useState([]);
+  const [activeUsers, setActiveUsers] = useState([]);
   // const [setActiveUsers] = useState([]);
 
   const [selectedChat, setSelectedChat] = useState(null);
@@ -66,29 +66,16 @@ const Dashboard = () => {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [typedText, setTypedText] = useState('');
   const [allUsers, setAllUsers] = useState([]);
-  console.log(setUserData)
+
+  const [isTyping, setIsTyping] = useState([]);
+
+  // to bypass production error as setUserData is never used
   useEffect(() => {
-    if (!socket || !userData?.id) return;
-
-    // Listen for status updates from the server
-    socket.on('updateUserStatus', (status) => {
-        // Check if status is an object, if so, update the status of all users
-        setAllUsers((prevUsers) => 
-            prevUsers.map((user) => ({
-                ...user,
-                status: status[user.id] || 'offline', // Default to 'offline' if no status found
-            }))
-        );
-    });
-
-    return () => {
-        socket.off('updateUserStatus'); // Clean up socket listeners on unmount
-    };
-}, [socket, userData?.id]);
-
-
-
-
+    setUserData(userData); 
+  }, [userData]);
+  
+  
+// console.log("All users : ", allUsers)
 
 
   // Fetch conversations on mount
@@ -116,31 +103,36 @@ const Dashboard = () => {
   }, []);
 
   // Listen to socket messages
-  // useEffect(() => {
-  //   if (socket) {
-  //     socket.emit('addUser', userData?.id);
-  
-  //     socket.on('getUsers', (users) => {
-  //       setActiveUsers(users);
-  //     });
-  
-  //     socket.on('getMessage', (data) => {
-  //       setMessages((prevState) => {
-  //         const newMessages = prevState?.messages?.data
-  //           ? [...prevState.messages.data, { user: data.user, message: data.message }]
-  //           : [{ user: data.user, message: data.message }];
-  //         return { ...prevState, messages: { ...prevState.messages, data: newMessages } };
-  //       });
-  //     });
-  //   }
-  
-  //   return () => {
-  //     if (socket) {
-  //       socket.off('getUsers');
-  //       socket.off('getMessage');
-  //     }
-  //   };
-  // }, [socket, userData]);
+  useEffect(() => {
+    if (socket) {
+      
+      if (userData?.id) {
+        socket.emit('addUser', userData.id);
+      }
+
+      
+      socket.on('getUsers', (users) => {
+        console.log("Active users received: ", users);
+        setActiveUsers(users); 
+      });
+
+      
+      socket.on('getMessage', (data) => {
+        setMessages((prevState) => {
+          const newMessages = prevState?.messages?.data
+            ? [...prevState.messages.data, { user: data.user, message: data.message }]
+            : [{ user: data.user, message: data.message }];
+          return { ...prevState, messages: { ...prevState.messages, data: newMessages } };
+        });
+      });
+
+      
+      return () => {
+        socket.off('getUsers');
+        socket.off('getMessage');
+      };
+    }
+  }, [socket, userData]);
   
 
   const handleSelectChat = async (chatId, name, id) => {
@@ -201,6 +193,43 @@ const Dashboard = () => {
     setTypedText('');
   };
 
+
+  
+  // TYPING LOGIC  
+// console.log("ConvoID: ",selectedChat, " UserId: ",userData.id)
+  const handleKeyPress = async () => {
+    socket.emit('typing',{userId:userData.id, conversationId:selectedChat})
+  }
+
+  const timedOutput = 5000;
+
+  useEffect(() => {
+    if (socket) { 
+      socket.on('typingReceieve', ({ userId, conversationId }) => { 
+        // console.log("FOR TYPING USERID: ", userId, " CONVOID: ", conversationId, "RECEIVERID: ",selectedId);
+        setIsTyping(prevState => { 
+          if (prevState.conversationId !== conversationId) {
+            return { userId, conversationId };  
+          }
+          return prevState;  
+        });
+        // console.log("isTypeing state:  ",isTyping)
+      });
+      
+
+      const typingTimeout = setTimeout(() => {
+         
+        if (isTyping?.userId) {
+          setIsTyping([]);  
+        }
+      }, timedOutput);
+  
+      return () => {
+        socket.off('typingReceieve');
+        clearTimeout(typingTimeout);  
+      };
+    }
+  }, [socket, typedText, isTyping]);
 
   const handleSocketLogout = () => {
     if (socket) {
@@ -276,7 +305,10 @@ const Dashboard = () => {
                     <div className="flex-1">
                         <div className="flex justify-between items-center">
                             <span className="font-semibold">{user?.name}</span>
-                            <span className="text-xs text-gray-500">{user?.email}</span>
+                            {/* <span className="text-xs text-gray-500">{user?.email}</span> */}
+                            <span className={`text-xs ${activeUsers.some(x => x.userId === user?.receiverId) ? 'text-green-500 font-semibold':'text-gray-500' }`}>
+                              { activeUsers.some(x => x.userId === user?.receiverId) ? 'Online' : 'Offline' }
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -315,7 +347,7 @@ const Dashboard = () => {
 
       {/* Main content */}
       <div id="currentChats" className="w-[27%] border overflow-y-scroll overflow-x-hidden h-screen">
-        <ChatList convoData={talks} onSelectChat={handleSelectChat} />
+        <ChatList setOnline={activeUsers} convoData={talks} onSelectChat={handleSelectChat} typingCheck={isTyping}/>
       </div>
 
       <div className="w-full sm:w-3/4 lg:w-[65%] border overflow-y-hidden overflow-x-hidden h-screen">
@@ -329,7 +361,10 @@ const Dashboard = () => {
                 <div className="h-12 w-12 bg-gray-300 border flex justify-center items-center rounded-full"><PersonOutlineOutlinedIcon/></div>
                 <div>
                   <h1 className="text-lg font-semibold text-black">{selectedName}</h1>
-                  <span className="text-sm text-gray-500">{userData.email}</span>
+                  {isTyping?.userId && isTyping?.userId !== userData.id
+                ? <span className="text-sm text-blue-500">Typing...</span>
+                : <span className="text-sm text-gray-500">{userData.email}</span>}                
+                  {/* <span className="text-sm text-gray-500">{userData.email}</span> */}
                 </div>
               </>
             )}
@@ -377,7 +412,7 @@ const Dashboard = () => {
           <div id="sendText" className="fixed bottom-0 w-full sm:w-[80%] lg:w-[70%] h-[12%] bg-white border-t-[1.5px] shadow-md flex items-center px-6">
             <input
               value={typedText}
-              onChange={(e) => setTypedText(e.target.value)}
+              onChange={(e) => {setTypedText(e.target.value); handleKeyPress();}}
               className="h-12 border border-gray-300 focus:border-0 outline-gray-300 rounded-lg px-6 w-[80%] bg-gray-100 text-black"
               type="text"
               placeholder="Type a message..."
