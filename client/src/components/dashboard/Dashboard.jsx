@@ -12,6 +12,7 @@ import { Toaster } from 'react-hot-toast';
 
 import IntroJs from 'intro.js';
 import 'intro.js/introjs.css';
+import Loader from '../Loader/Loader';
 
 const Dashboard = () => {
 
@@ -56,6 +57,7 @@ const Dashboard = () => {
   // const [users, setUsers] = useState([]);
   const [activeUsers, setActiveUsers] = useState([]);
   // const [setActiveUsers] = useState([]);
+  const [isLoading,setIsLoading] = useState(false)
 
   const [selectedChat, setSelectedChat] = useState(null);
   const [selectedName, setSelectedName] = useState('');
@@ -68,6 +70,8 @@ const Dashboard = () => {
   const [allUsers, setAllUsers] = useState([]);
 
   const [isTyping, setIsTyping] = useState([]);
+
+  const [newMsgAlert, setNewMsgAlert] = useState([]);
 
   // to bypass production error as setUserData is never used
   useEffect(() => {
@@ -142,14 +146,23 @@ const Dashboard = () => {
     setMessages({ messages: { data: [] } }); // Clear messages when changing chat
 
     if (chatId !== 'new') {
+      setIsLoading(true)
+      try{
       const resx = await axios.get(`/api/message/${chatId}`);
       setMessages({ messages: { data: resx.data } });
+      }catch(e){
+        console.log("Error handleSelectChat: ",e)
+      }finally{
+        setIsLoading(false)
+      }
     }
   };
+
 
   // Send message via socket and API
   const sendMessage = async () => {
     if (selectedChat === 'new') {
+      setIsLoading(true)
       // Send "Hi" for new chat
       socket.emit('sendMessage', {
         conversationId: selectedChat,
@@ -157,7 +170,7 @@ const Dashboard = () => {
         message: 'Hi',
         receiverId: selectedId,
       });
-  
+      
       try {
         await axios.post('/api/message', {
           conversationId: selectedChat,
@@ -167,8 +180,11 @@ const Dashboard = () => {
         });
       } catch (error) {
         console.log('Error in posting new message: ', error);
+      }finally{
+        setIsLoading(false);
       }
     } else {
+      setIsLoading(true)
       // Only emit the message to the socket, don't update the state yet
       socket.emit('sendMessage', {
         conversationId: selectedChat,
@@ -186,9 +202,18 @@ const Dashboard = () => {
         });
       } catch (error) {
         console.log('Error in posting new message: ', error);
+      }finally{
+        setIsLoading(false)
       }
     }
   
+    console.log("Message sent:: ",messages," conversationID:  ",selectedChat)
+    if(activeUsers.some(x => x.userId !== selectedId)){
+      setNewMsgAlert(prev => [...prev, { sendId: userData.id, receiveId: selectedId, convoId: selectedChat }])
+    }
+    console.log("new msg is here for::: ",newMsgAlert)
+    // talks.some(x => x.user?.id === selectedId)
+    // console.log("TALKS: ",talks)
     // Reset typed text after sending the message
     setTypedText('');
   };
@@ -347,7 +372,7 @@ const Dashboard = () => {
 
       {/* Main content */}
       <div id="currentChats" className="w-[27%] border overflow-y-scroll overflow-x-hidden h-screen">
-        <ChatList setOnline={activeUsers} convoData={talks} onSelectChat={handleSelectChat} typingCheck={isTyping}/>
+        <ChatList setOnline={activeUsers} convoData={talks} onSelectChat={handleSelectChat} typingCheck={isTyping} msgWhenOffline={newMsgAlert}/>
       </div>
 
       <div className="w-full sm:w-3/4 lg:w-[65%] border overflow-y-hidden overflow-x-hidden h-screen">
@@ -376,7 +401,9 @@ const Dashboard = () => {
           <div className="absolute w-72 h-72 bg-[rgba(79,70,229,0.35)] rounded-full blur-[100px] top-20 left-10"></div>
           <div className="absolute w-96 h-96 bg-[rgba(79,70,229,0.35)] rounded-full blur-[100px] top-1/2 right-10"></div>
           <div className="absolute w-48 h-48 bg-[rgba(79,70,229,0.35)] rounded-full blur-[100px] bottom-10 left-1/2 transform -translate-x-1/2"></div>
-          
+          {isLoading && <div className="absolute z-20 h-screen top-0 left-0 bg-black/55 flex flex-col justify-center items-center w-full">
+                    <Loader />
+                </div>}
           {/* Message list */}
           <div className="overflow-y-auto h-[70vh] sm:h-[70vh] px-6 relative z-10">
           {messages?.messages?.data?.length > 0 ? (

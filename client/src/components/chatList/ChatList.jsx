@@ -4,10 +4,20 @@ import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import { Toaster } from 'react-hot-toast';
 
-const ChatList = ({ setOnline, convoData, onSelectChat, typingCheck }) => {
+const ChatList = ({ setOnline, convoData, onSelectChat, typingCheck, msgWhenOffline }) => {
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [userData, setUserData] = useState(JSON.parse(localStorage.getItem('user:detail')));
+  const [chatOpen, setChatOpen] = useState(null);
+  const [seenChats, setSeenChats] = useState([]);
+
+  const handleChatOpen = (conversationId) => {
+
+    if(msgWhenOffline.some(x=>x.sendId === userData?.id)){
+      setSeenChats(prev => [...prev, conversationId]);
+    }
+    setChatOpen(conversationId); // Also update the chatOpen state to track the currently opened chat
+  };
 
   function handleSearch() {
     setIsSearching(true);
@@ -21,8 +31,11 @@ const ChatList = ({ setOnline, convoData, onSelectChat, typingCheck }) => {
   useEffect(()=>{
     setUserData(userData)
   },[userData])
+
   // To track the unique users
   const seenUsers = new Set();
+
+  // console.log("Talks;:: ",latestMsg.messages.data[latestMsg.messages.data.length-1].message)
 
   // Filtered list of conversations without duplicate users
   const filteredData = convoData.filter(({ user }) => {
@@ -77,14 +90,15 @@ const ChatList = ({ setOnline, convoData, onSelectChat, typingCheck }) => {
             .map(({ conversationId, user, index }) => {
               // Use conversationId as the key, if available; otherwise fallback to index
               const key = conversationId || index;
-
+              const isSelected = conversationId === chatOpen;
               return (
                 <div key={key} className="border-b-[1.5px] cursor-pointer">
                   <div
-                    className="mt-2 flex items-center rounded-lg p-3 mb-2 hover:bg-gray-100"
+                    className={`mt-2 flex items-center rounded-lg p-3 mb-2 ${isSelected ? 'bg-gray-100' : 'bg-white'} hover:bg-gray-100`} 
                     onClick={() => {
                       // console.log("userName selected: ", user);
                       onSelectChat(conversationId, user?.name, user?.id);
+                        handleChatOpen(conversationId);
                     }}
                   >
                     <div className="w-10 h-10 bg-gray-300 flex justify-center items-center rounded-full mr-3"><PersonOutlineOutlinedIcon/></div>
@@ -94,7 +108,14 @@ const ChatList = ({ setOnline, convoData, onSelectChat, typingCheck }) => {
                         <span className="font-semibold">{user?.name}</span>
                         {typingCheck?.userId && typingCheck?.userId !== userData.id && typingCheck?.conversationId === conversationId
                 ? <span className="text-sm text-blue-500">Typing...</span>
-                : <span className="text-sm text-gray-500">{userData.email}</span>}                
+                : <span className="text-sm text-gray-500">{userData.email}</span>}   
+
+{/* {msgWhenOffline.some(x => x.receiveId === user?.id && x.convoId === chatOpen)?<span>Seen</span>:<span>Delivered</span>} */}
+                          
+            {seenChats.includes(conversationId) 
+              ? <span className="text-sm text-green-500">Seen</span>
+              : <span className="text-sm text-gray-500">Delivered</span>
+            }
                   {/* <span className="text-sm text-gray-500">{userData.email}</span> */}
                         {/* <span className="text-xs text-gray-500">{user?.email}</span> */}
                         </div>

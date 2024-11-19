@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
+import Loader from '../../components/Loader/Loader';
 
 
 const RegisterPage = () => {
@@ -10,9 +11,11 @@ const RegisterPage = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false)
 
     const registerUser = async (e) => {
         e.preventDefault()
+        setIsLoading(true)
         try {
             console.log("Data sent: ",{name, email, password})
             await axios.post('/api/register',{ name, email, password })
@@ -22,6 +25,9 @@ const RegisterPage = () => {
         } catch (error) {
             console.log('Error on RegisterPage client: ',error)
             toast.error("Error: ",error)
+        }
+        finally{
+          setIsLoading(false)
         }
     }
 
@@ -33,7 +39,9 @@ const RegisterPage = () => {
   <div className="absolute w-72 h-72 bg-[rgba(79,70,229,0.35)] rounded-full blur-[100px] top-10 left-10 sm:w-96 sm:h-96 md:w-[350px] md:h-[350px] lg:w-72 lg:h-72"></div>
   <div className="absolute w-96 h-96 bg-[rgba(79,70,229,0.35)] rounded-full blur-[100px] top-1/2 right-10 sm:w-[400px] sm:h-[400px] md:w-[450px] md:h-[450px] lg:w-96 lg:h-96"></div>
   <div className="absolute w-48 h-48 bg-[rgba(79,70,229,0.35)] rounded-full blur-[100px] bottom-10 left-1/2 transform -translate-x-1/2 sm:w-72 sm:h-72 md:w-[250px] md:h-[250px] lg:w-48 lg:h-48"></div>
-
+  {isLoading && <div className="absolute z-20 h-screen top-0 left-0 bg-black/55 flex flex-col justify-center items-center w-full">
+                    <Loader />
+                </div>}
 {/* Trial login info */}
 <div className="absolute mt-2 border rounded-lg top-0 left-1/2 transform -translate-x-1/2 p-4 bg-blue-400 text-white text-sm sm:text-base text-center w-auto">
   <p>
