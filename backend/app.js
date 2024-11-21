@@ -2,6 +2,14 @@ const express = require('express');
 const bcryptjs = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const cors = require('cors')
+const Groq = require('groq-sdk');
+const dotenv = require('dotenv');
+
+// Initialize dotenv to load environment variables
+dotenv.config();
+
+const groq = new Groq({ apiKey:  process.env.GROQ_KEY});
+
 const io = require('socket.io')(8080,{
     cors: {
         origin: ['https://chat-application-seven-eosin.vercel.app','http://localhost:3000']
@@ -102,7 +110,7 @@ io.on('connection', socket => {
 
 app.post('/api/register',async (req,res,next)=>{
     try {
-        const {name, email, password} = req.body;
+        const {name, email, password, imageURL = ''} = req.body;
         if(!name || !email || !password){
             res.status(400).send("Fill required details")
         }else{
@@ -111,7 +119,7 @@ app.post('/api/register',async (req,res,next)=>{
                 res.status(400).send("User exists")
             }
             else{
-                const newUser = new Users({ name, email })
+                const newUser = new Users({ name, email, imageURL })
                 bcryptjs.hash(password, 10, (err, hashedPass)=>{
                     newUser.set('password', hashedPass);
                     newUser.save();
@@ -150,7 +158,7 @@ app.post('/api/login', async (req,res,next)=>{
                         // console.log("token setting error",err)
                         next()
                     })
-                    res.status(200).json({ user:{ id: user._id, email: user.email, name:user.name}, token: user.token })
+                    res.status(200).json({ user:{ id: user._id, email: user.email, name:user.name, profileImage:user.imageURL}, token: user.token })
                 }
             }
         }
@@ -178,7 +186,7 @@ app.get('/api/conversations/:userId', async (req,res) => {
             const receiverId =conversation.members.find((member)=> member !== userId);
             const user = await Users.findById(receiverId);
             // console.log("id: ",user.id,"Email: ",user.email," name: ",user.name, "ConversationID: ",conversation._id)
-            return { user:{id:user.id, email: user.email, name:user.name},conversationId: conversation._id }
+            return { user:{id:user.id, email: user.email, name:user.name, profileImage:user.imageURL},conversationId: conversation._id }
         }))
         res.status(200).json(await conversationUserData);
     } catch (error) {
@@ -313,12 +321,37 @@ app.get('/api/users', async (req,res) => {
     try {
         const users = await Users.find();
         const usersData = Promise.all(users.map(async (user) => {
-            return { user: { email: user.email, name: user.name, receiverId: user._id } }
+            return { user: { email: user.email, name: user.name, profileImage:user.imageURL, receiverId: user._id } }
         }))
         res.status(200).json(await usersData);
     } catch (error) {
         console.log("Error: ",error)
     }
+})
+
+app.post('/api/messageai', async (req,res)=>{
+    try {
+        const {msg} = req.body;
+        const completion = await groq.chat.completions.create({
+          messages: [
+            {
+              role: "user",
+              content: "For the following text, give a suitable answer to fulfill a chat like enviornment "+msg,
+            },
+          ],
+          model: "llama3-8b-8192",
+          temperature: 0.7,
+          max_tokens: 1024,
+        });
+        return res.status(200).json({
+            success: true,
+            response: completion.choices[0]?.message?.content || "No response generated"
+        });
+
+    } catch (error) {
+        console.error('Error during AI chat generation : ', error);
+    }
+
 })
 
 app.listen(PORT, (req,res)=>{
