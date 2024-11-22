@@ -6,6 +6,8 @@ const http = require('http');
 const Groq = require('groq-sdk');
 const dotenv = require('dotenv');
 
+const app = express();
+
 // Initialize dotenv to load environment variables
 dotenv.config();
 
@@ -36,7 +38,7 @@ const Users = require('./models/Users')
 const Conversations = require('./models/Conversation');
 const Messages = require('./models/Messages');
 
-const app = express();
+
 
 
 app.use(express.json())
