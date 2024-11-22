@@ -101,7 +101,7 @@ const Dashboard = () => {
 
   // Handle socket connection
   useEffect(() => {
-    const socketInstance = io("http://localhost:8080");
+    const socketInstance = io("https://chat-application-3jzb.onrender.com");
     setSocket(socketInstance);
 
     return () => {

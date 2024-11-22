@@ -10,7 +10,8 @@ dotenv.config();
 
 const groq = new Groq({ apiKey:  process.env.GROQ_KEY});
 
-const io = require('socket.io')(8080,{
+const socketPort = process.env.PORT || 8080
+const io = require('socket.io')(socketPort,{
     cors: {
         origin: ['https://chat-application-seven-eosin.vercel.app','http://localhost:3000']
     }
