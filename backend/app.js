@@ -2,6 +2,7 @@ const express = require('express');
 const bcryptjs = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const cors = require('cors')
+const http = require('http');
 const Groq = require('groq-sdk');
 const dotenv = require('dotenv');
 
