@@ -10,12 +10,20 @@ dotenv.config();
 
 const groq = new Groq({ apiKey:  process.env.GROQ_KEY});
 
-const socketPort = process.env.PORT || 8080
-const io = require('socket.io')(socketPort,{
-    cors: {
-        origin: ['https://chat-application-seven-eosin.vercel.app','http://localhost:3000']
-    }
-})
+const PORT = process.env.PORT || 8000;
+
+// Create an HTTP server using the Express app
+const server = http.createServer(app);
+
+// Initialize Socket.IO with the same server
+const io = socketIo(server, {
+  cors: {
+    origin: ['https://chat-application-seven-eosin.vercel.app', 'http://localhost:3000'],
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type'],
+    credentials: true,
+  },
+});
 
 // const port = 'https://chat-application-3jzb.onrender.com';
 
@@ -28,7 +36,7 @@ const Conversations = require('./models/Conversation');
 const Messages = require('./models/Messages');
 
 const app = express();
-const PORT = process.env.PORT || 8000;
+
 
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
