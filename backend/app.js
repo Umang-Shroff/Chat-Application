@@ -5,6 +5,7 @@ const cors = require('cors')
 const http = require('http');
 const Groq = require('groq-sdk');
 const dotenv = require('dotenv');
+const socketIo = require('socket.io')
 
 const app = express();
 
